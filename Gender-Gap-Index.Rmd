@@ -1,0 +1,142 @@
+---
+title: "Gender-Gap-Index"
+author: "Josep Monclús Carrasco y Joel Giner Tarazón"
+date: "2023-03-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## CF
+
+```{r}
+library(readr)
+library(dplyr)
+CF <- read_delim("data/CF.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()), locale = locale(decimal_mark = ","), trim_ws = TRUE)
+#head(CF)
+h = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Hombres")
+m = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Mujeres")
+#h$Total-m$Total
+```
+
+
+
+## E2E
+
+```{r}
+library(readr)
+E2E <- read_delim("data/E2E.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()),locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
+#head(E2E)
+m = E2E %>% group_by(Periodo) %>% summarise(Sexo,Total) %>% dplyr::filter(`Sexo` == "Mujeres")
+t = E2E %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm = T))
+t$DE2E = abs((m$Total - t$Total)/t$Total)
+t$DE2ED = 1 - (dnorm(t$DE2E,0.5,0.09) / dnorm(0.5,0.5,0.09))
+t$Year = t$Periodo
+t = t[,c("Year","DE2ED")]
+E2E = t
+E2E
+```
+
+## EMP
+
+```{r}
+library(readr)
+EMP <- read_delim("data/EMP.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
+#head(EMP)
+EMP = EMP %>% mutate(SEXO = ifelse(SEXO == 1,"Hombre",ifelse(SEXO == 2,"Mujer",NA)))
+a = EMP %>% group_by(SEXO,TRBPRN1) %>% summarise(TOTAL = sum(FACTOR)) %>%mutate(Porcentaje_personas = (TOTAL / sum(TOTAL))) %>% dplyr::filter(TRBPRN1 == 1)
+#a
+```
+
+
+## GEI
+
+```{r}
+library(readr)
+GEI <- read_csv("data/GEI.csv")
+GEI$GEI = GEI$`Exclusion by Gender`
+GEI = GEI[,c("Year","GEI")]
+GEI
+```
+
+## ACM
+
+```{r}
+library(tidyr)
+PrivateACM <- read_delim("data/PrivateACM.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(...2 = col_skip(), 
+        ...4 = col_skip(), ...6 = col_skip(), 
+        ...8 = col_skip(), ...10 = col_skip(), 
+        ...12 = col_skip(), ...14 = col_skip(), 
+        ...16 = col_skip(), ...17 = col_skip(), 
+        ...1 = col_skip()), locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE, skip = 2)[1,] %>% gather(key="Year", value="ACM", 1:7)
+PublicACM <- read_delim("data/PublicACM.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(...2 = col_skip(), 
+        ...4 = col_skip(), ...6 = col_skip(), 
+        ...8 = col_skip(), ...10 = col_skip(), 
+        ...12 = col_skip(), ...14 = col_skip(), 
+        ...1 = col_skip()), locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE, skip = 2)[1,] %>% gather(key="Year", value="ACM", 1:7)
+
+PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+
+PrivateACM
+PublicACM
+```
+
+## PAR
+
+```{r}
+PAR <- read_delim("data/PAR.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()), locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
+m = PAR %>% dplyr::filter(`Sexo/Brecha de género` == "Mujeres") %>% dplyr::select(c(Periodo,Total))%>% arrange(Periodo)
+tot = PAR %>% dplyr::filter(`Sexo/Brecha de género` != "Brecha de género (mujeres - hombres)")%>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
+tot$PAR = abs((m$Total - tot$Total)/tot$Total)
+tot$PARD = 1 - (dnorm(tot$PAR,0.5,0.09) / dnorm(0.5,0.5,0.09))
+tot$Year = tot$Periodo
+tot = tot[,c("Year","PARD")]
+PAR = tot
+PAR
+```
+
+## SAL
+
+```{r}
+SAL <- read_delim("data/SAL.csv", delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Sexo/Brecha de genero` != "Cociente mujeres respecto a hombres")
+m = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Mujeres")
+tot2 = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
+tot2$TSAL = abs((m$Total - tot2$Total)/tot2$Total)
+tot2$SALD = 1 - (dnorm(tot2$TSAL,0.5,0.09) / dnorm(0.5,0.5,0.09))
+tot2$Year = tot2$Periodo
+tot2 = tot2[,c("Year","SALD")]
+SAL = tot2
+SAL
+```
+
+
+## VVG
+
+```{r}
+VVG <- read_delim("data/VVG.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(...1 = col_double(),...2 = col_skip(), 
+        ...4 = col_skip(), ...5 = col_skip()), 
+    trim_ws = TRUE, skip = 2)
+VVG$Year = VVG$...1
+VVG = VVG[,c("Year","Número")]
+VVG$RVVG = VVG$Número / max(VVG$Número,na.rm = T)
+VVG = VVG[,c("Year","RVVG")]
+VVG
+```
+
+
+# Cálculo del Indicador General de Brecha de Género
+
+```{r}
+
+```
+
