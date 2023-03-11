@@ -26,7 +26,6 @@ m = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Tot
 ## E2E
 
 ```{r}
-library(readr)
 E2E <- read_delim("data/E2E.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()),locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
 #head(E2E)
 m = E2E %>% group_by(Periodo) %>% summarise(Sexo,Total) %>% dplyr::filter(`Sexo` == "Mujeres")
@@ -42,19 +41,17 @@ E2E
 ## EMP
 
 ```{r}
-library(readr)
 EMP <- read_delim("data/EMP.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 #head(EMP)
 EMP = EMP %>% mutate(SEXO = ifelse(SEXO == 1,"Hombre",ifelse(SEXO == 2,"Mujer",NA)))
 a = EMP %>% group_by(SEXO,TRBPRN1) %>% summarise(TOTAL = sum(FACTOR)) %>%mutate(Porcentaje_personas = (TOTAL / sum(TOTAL))) %>% dplyr::filter(TRBPRN1 == 1)
-#a
+a
 ```
 
 
 ## GEI
 
 ```{r}
-library(readr)
 GEI <- read_csv("data/GEI.csv")
 GEI$GEI = GEI$`Exclusion by Gender`
 GEI = GEI[,c("Year","GEI")]
@@ -81,8 +78,15 @@ PublicACM <- read_delim("data/PublicACM.csv",
         ...1 = col_skip()), locale = locale(decimal_mark = ","), 
     trim_ws = TRUE, skip = 2)[1,] %>% gather(key="Year", value="ACM", 1:7)
 
-PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
-PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+ACM <- rbind(PrivateACM,PublicACM) %>% group_by(Year) %>% summarise_all(.,mean)
+
+
+# PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+# PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+
+ACM$ACMD = 1 - (dnorm(ACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+
+ACM$Year <- as.double(ACM$Year)
 
 PrivateACM
 PublicACM
@@ -130,13 +134,54 @@ VVG$Year = VVG$...1
 VVG = VVG[,c("Year","Número")]
 VVG$RVVG = VVG$Número / max(VVG$Número,na.rm = T)
 VVG = VVG[,c("Year","RVVG")]
-VVG
+VVG <- head(VVG, 24)
 ```
 
 
 # Cálculo del Indicador General de Brecha de Género
 
-```{r}
+CF
+E2E
+EMP
+GEI
+PAR
+ACM
+SAL
+VVG
 
+
+
+```{r, message=FALSE}
+df <- full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG))
+
+GGI <- function(df, year){
+  df = df[df$Year==year,]
+  
+  ECO <- df$SALD * 0.3 + df$PARD * 0.3 + df$ACMD * 0.3
+  SOC <- df$RVVG * 0.3 + df$GEI * 0.3
+  CUL <- df$DE2ED
+  
+  return(ECO*0.3 + SOC*0.3 + CUL*0.3)
+}
+
+
+GGI(df,2015)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
