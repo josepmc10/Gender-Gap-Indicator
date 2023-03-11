@@ -26,12 +26,13 @@ m = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Tot
 ## E2E
 
 ```{r}
+library(readr)
 E2E <- read_delim("data/E2E.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()),locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
 #head(E2E)
 m = E2E %>% group_by(Periodo) %>% summarise(Sexo,Total) %>% dplyr::filter(`Sexo` == "Mujeres")
 t = E2E %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm = T))
 t$DE2E = abs((m$Total - t$Total)/t$Total)
-t$DE2ED = 1 - (dnorm(t$DE2E,0.5,0.09) / dnorm(0.5,0.5,0.09))
+t$DE2ED = dnorm(t$DE2E,0.5,0.09) / dnorm(0.5,0.5,0.09)
 t$Year = t$Periodo
 t = t[,c("Year","DE2ED")]
 E2E = t
@@ -41,19 +42,21 @@ E2E
 ## EMP
 
 ```{r}
+library(readr)
 EMP <- read_delim("data/EMP.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
 #head(EMP)
 EMP = EMP %>% mutate(SEXO = ifelse(SEXO == 1,"Hombre",ifelse(SEXO == 2,"Mujer",NA)))
 a = EMP %>% group_by(SEXO,TRBPRN1) %>% summarise(TOTAL = sum(FACTOR)) %>%mutate(Porcentaje_personas = (TOTAL / sum(TOTAL))) %>% dplyr::filter(TRBPRN1 == 1)
-a
+#a
 ```
 
 
 ## GEI
 
 ```{r}
+library(readr)
 GEI <- read_csv("data/GEI.csv")
-GEI$GEI = GEI$`Exclusion by Gender`
+GEI$GEI = 1 - GEI$`Exclusion by Gender`
 GEI = GEI[,c("Year","GEI")]
 GEI
 ```
@@ -81,15 +84,14 @@ PublicACM <- read_delim("data/PublicACM.csv",
 ACM <- rbind(PrivateACM,PublicACM) %>% group_by(Year) %>% summarise_all(.,mean)
 
 
-# PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
-# PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
-
-ACM$ACMD = 1 - (dnorm(ACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+ACM$ACMD = dnorm(ACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09)
 
 ACM$Year <- as.double(ACM$Year)
 
-PrivateACM
-PublicACM
+#PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+#PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
+#PrivateACM
+#PublicACM
 ```
 
 ## PAR
@@ -101,7 +103,7 @@ PAR <- read_delim("data/PAR.csv",
 m = PAR %>% dplyr::filter(`Sexo/Brecha de género` == "Mujeres") %>% dplyr::select(c(Periodo,Total))%>% arrange(Periodo)
 tot = PAR %>% dplyr::filter(`Sexo/Brecha de género` != "Brecha de género (mujeres - hombres)")%>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
 tot$PAR = abs((m$Total - tot$Total)/tot$Total)
-tot$PARD = 1 - (dnorm(tot$PAR,0.5,0.09) / dnorm(0.5,0.5,0.09))
+tot$PARD = dnorm(tot$PAR,0.5,0.09) / dnorm(0.5,0.5,0.09)
 tot$Year = tot$Periodo
 tot = tot[,c("Year","PARD")]
 PAR = tot
@@ -115,7 +117,7 @@ SAL <- read_delim("data/SAL.csv", delim = ";", escape_double = FALSE, locale = l
 m = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Mujeres")
 tot2 = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
 tot2$TSAL = abs((m$Total - tot2$Total)/tot2$Total)
-tot2$SALD = 1 - (dnorm(tot2$TSAL,0.5,0.09) / dnorm(0.5,0.5,0.09))
+tot2$SALD = dnorm(tot2$TSAL,0.5,0.09) / dnorm(0.5,0.5,0.09)
 tot2$Year = tot2$Periodo
 tot2 = tot2[,c("Year","SALD")]
 SAL = tot2
@@ -132,56 +134,59 @@ VVG <- read_delim("data/VVG.csv",
     trim_ws = TRUE, skip = 2)
 VVG$Year = VVG$...1
 VVG = VVG[,c("Year","Número")]
-VVG$RVVG = VVG$Número / max(VVG$Número,na.rm = T)
+VVG$RVVG = 1 - (VVG$Número / max(VVG$Número,na.rm = T))
 VVG = VVG[,c("Year","RVVG")]
-VVG <- head(VVG, 24)
+VVG
 ```
 
 
 # Cálculo del Indicador General de Brecha de Género
 
-CF
-E2E
-EMP
-GEI
-PAR
-ACM
-SAL
-VVG
-
-
-
-```{r, message=FALSE}
-df <- full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG))
-
+```{r}
+df <- full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG)) %>% drop_na()
 GGI <- function(df, year){
   df = df[df$Year==year,]
   
-  ECO <- df$SALD * 0.3 + df$PARD * 0.3 + df$ACMD * 0.3
-  SOC <- df$RVVG * 0.3 + df$GEI * 0.3
+  ECO <- mean(c(df$SALD,df$PARD,df$ACMD))
+  SOC <- mean(c(df$RVVG,df$GEI))
   CUL <- df$DE2ED
   
-  return(ECO*0.3 + SOC*0.3 + CUL*0.3)
+  return(c(ECO,SOC,CUL))
 }
-
-
-GGI(df,2015)
+areas = c("ECONOMIC","SOCIAL","CULTURAL")
+ggi = GGI(df,2020)
+ggi1 = GGI(df,2015)
+df_plot = data.frame(ECONOMIC = c(1,0,ggi[1],ggi1[1]), SOCIAL = c(1,0,ggi[2],ggi1[2]), CULTURAL = c(1,0,ggi[3],ggi1[3]))
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+library(fmsb)
+create_beautiful_radarchart <- function(data, color = "#00AFBB", 
+                                        vlabels = colnames(data), vlcex = 0.7,
+                                        caxislabels = NULL,plty = 1,pty = 32, title = NULL, ...){
+  radarchart(
+    data, axistype = 1,
+    # Customize the polygon , pfcol = scales::alpha(color, 0.5)
+    pcol = color, plwd = 2, plty = plty,pty = pty,
+    # Customize the grid
+    cglcol = "grey", cglty = 1, cglwd = 0.8,
+    # Customize the axis
+    axislabcol = "grey", 
+    # Variable labels
+    vlcex = vlcex, vlabels = vlabels,
+    caxislabels = caxislabels, title = title, ...
+  )
+}
+#create_beautiful_radarchart(df_plot, caxislabels = c("", "", "", "", ""),title = "Gender Gap Index")
+create_beautiful_radarchart(
+  data = df_plot, caxislabels = c("", "", "", "", ""),
+  color = c("#00AFBB", "#E7B800"),title = "Gender Gap Index",plty = c("solid", "dotted"),
+  pty = c(16,32)
+)
+legend(
+  x = "bottom", legend = c("2020","2015"), horiz = TRUE,
+  bty = "n", pch = 20 , col = c("#00AFBB", "#E7B800"),
+  text.col = "black", cex = 1, pt.cex = 1.5
+  )
+```
 
