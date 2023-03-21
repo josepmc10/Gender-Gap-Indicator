@@ -115,6 +115,9 @@ PAR
 ```{r}
 SAL <- read_delim("data/SAL.csv", delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Sexo/Brecha de genero` != "Cociente mujeres respecto a hombres")
 m = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Mujeres")
+#m 18635.06	
+h = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Hombres")
+#h 22302.60	
 tot2 = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
 tot2$TSAL = abs((m$Total - tot2$Total)/tot2$Total)
 tot2$SALD = dnorm(tot2$TSAL,0.5,0.09) / dnorm(0.5,0.5,0.09)
@@ -143,6 +146,7 @@ VVG
 # Cálculo del Indicador General de Brecha de Género
 
 ```{r}
+library(tidyr)
 df <- full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG)) %>% drop_na()
 GGI <- function(df, year){
   df = df[df$Year==year,]
@@ -151,12 +155,12 @@ GGI <- function(df, year){
   SOC <- mean(c(df$RVVG,df$GEI))
   CUL <- df$DE2ED
   
-  return(c(ECO,SOC,CUL))
+  return(c(ECO,SOC,CUL,mean(c(ECO,SOC,CUL))))
 }
 areas = c("ECONOMIC","SOCIAL","CULTURAL")
 ggi = GGI(df,2020)
 ggi1 = GGI(df,2015)
-df_plot = data.frame(ECONOMIC = c(1,0,ggi[1],ggi1[1]), SOCIAL = c(1,0,ggi[2],ggi1[2]), CULTURAL = c(1,0,ggi[3],ggi1[3]))
+df_plot = data.frame(Economico = c(ggi[1],ggi1[1]), Social = c(ggi[2],ggi1[2]), Cultural = c(ggi[3],ggi1[3]))
 ```
 
 ```{r}
@@ -166,8 +170,8 @@ create_beautiful_radarchart <- function(data, color = "#00AFBB",
                                         caxislabels = NULL,plty = 1,pty = 32, title = NULL, ...){
   radarchart(
     data, axistype = 1,
-    # Customize the polygon , pfcol = scales::alpha(color, 0.5)
-    pcol = color, plwd = 2, plty = plty,pty = pty,
+    # Customize the polygon 
+    pcol = color, plwd = 2, plty = plty,pty = pty, pfcol = scales::alpha("#00AFBB", 0.3),
     # Customize the grid
     cglcol = "grey", cglty = 1, cglwd = 0.8,
     # Customize the axis
@@ -180,7 +184,7 @@ create_beautiful_radarchart <- function(data, color = "#00AFBB",
 #create_beautiful_radarchart(df_plot, caxislabels = c("", "", "", "", ""),title = "Gender Gap Index")
 create_beautiful_radarchart(
   data = df_plot, caxislabels = c("", "", "", "", ""),
-  color = c("#00AFBB", "#E7B800"),title = "Gender Gap Index",plty = c("solid", "dotted"),
+  color = c("#00AFBB", "#E7B800"),title = "Indicador de Brecha de Género Generalizado",plty = c("solid", "dotted"),
   pty = c(16,32)
 )
 legend(
@@ -190,3 +194,53 @@ legend(
   )
 ```
 
+```{r}
+library(ggradar)
+library(dplyr)
+df_plot$Grupo = c(2020,2015)
+df_plot = df_plot %>% dplyr::select(c(Grupo,Economico,Social,Cultural))
+ 
+lcols = c("#57ebc8","#79918d")
+grap = ggradar(df_plot,background.circle.colour = "white",fill = TRUE,fill.alpha = 0.2,group.colours = lcols
+        ,plot.legend = FALSE,
+        gridline.min.colour = "gray60",
+        gridline.mid.colour = "gray60",
+        gridline.max.colour = "gray60",
+        values.radar = c("", "", ""),
+        group.point.size = 0
+        )+           # Make background transparent
+  theme(rect = element_rect(fill = "transparent"))
+grap
+#Fonts
+ggsave(grap,            # Save transparent png file
+       filename = "ggp_transparent1.png",
+       bg = "transparent")
+#,font.radar = "") 
+```
+
+
+```{r}
+library(ggplot2)
+años = c(2015,2016,2017,2018,2019,2020)
+GGI = c(0.6925274,0.7182317,0.7177220,0.7245621,0.7161718,0.7437936)
+data = data.frame(Años = años,`Indice Brecha Genero` = GGI)
+ggplot(data,aes(x = años, y = GGI)) + geom_line(color = "#79918d",size = 1.25) + geom_point(color = "#79918d",shape = 4,size = 4) + ylim(c(0.6,0.9))
+#grosor lineas
+#fondo blando
+#sin fondo si se puede
+# color 
+#tipos punto
+```
+
+```{r}
+#SALARIO 
+22302.60 - 18635.06
+ggplot() + geom_line(aes(x = c(18635.06,22302.60),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(18635.06,22302.60),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,80000)) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+```
+
+```{r}
+100 - 35.60	
+#Altos cargos Mujeres
+35.60 - 64.4
+ggplot() + geom_line(aes(x = c(35.60,64.4),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(35.60,64.4),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,100)) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+```
