@@ -5,4 +5,6 @@ The result of this work is the implementation of a Gender Gap Index that provide
 
 ![Gender Gap Index](/figures/radar_plot.png)
 
+![Temporal Serie](/figures/temporal_plot.png)
+
 
