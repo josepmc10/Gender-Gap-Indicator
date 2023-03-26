@@ -9,63 +9,58 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## CF
+```{r}
+distribution = function(value){
+  if (!is.na(value)){
+    if (value <= 0.5){
+      return(value/0.5)
+    }
+    else{
+      return((1-value)/0.5)
+    }
+  }
+  else{
+    return(NA)
+  }
+}
+```
+
+
+## E2E (Educación Secundaria superada)
 
 ```{r}
 library(readr)
 library(dplyr)
-CF <- read_delim("data/CF.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()), locale = locale(decimal_mark = ","), trim_ws = TRUE)
-#head(CF)
-h = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Hombres")
-m = CF %>% group_by(periodo,Sexo,`Grupos de edad`) %>% summarise(Total = sum(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Mujeres")
-#h$Total-m$Total
-```
-
-
-
-## E2E
-
-```{r}
-library(readr)
-E2E <- read_delim("data/E2E.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()),locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
+E2E <- read_delim("../data/E2E.csv", delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()),locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
 #head(E2E)
 m = E2E %>% group_by(Periodo) %>% summarise(Sexo,Total) %>% dplyr::filter(`Sexo` == "Mujeres")
+
+h = E2E %>% group_by(Periodo) %>% summarise(Sexo,Total) %>% dplyr::filter(`Sexo` == "Hombres")
 t = E2E %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm = T))
-t$DE2E = abs((m$Total - t$Total)/t$Total)
-t$DE2ED = dnorm(t$DE2E,0.5,0.09) / dnorm(0.5,0.5,0.09)
+t$DE2E = m$Total / t$Total
+t$DE2ED = sapply(t$DE2E,distribution)
 t$Year = t$Periodo
 t = t[,c("Year","DE2ED")]
 E2E = t
 E2E
 ```
 
-## EMP
+
+## GEI (Gender Exclusion Index)
 
 ```{r}
 library(readr)
-EMP <- read_delim("data/EMP.csv", delim = "\t", escape_double = FALSE, trim_ws = TRUE)
-#head(EMP)
-EMP = EMP %>% mutate(SEXO = ifelse(SEXO == 1,"Hombre",ifelse(SEXO == 2,"Mujer",NA)))
-a = EMP %>% group_by(SEXO,TRBPRN1) %>% summarise(TOTAL = sum(FACTOR)) %>%mutate(Porcentaje_personas = (TOTAL / sum(TOTAL))) %>% dplyr::filter(TRBPRN1 == 1)
-#a
-```
-
-
-## GEI
-
-```{r}
-library(readr)
-GEI <- read_csv("data/GEI.csv")
+GEI <- read_csv("../data/GEI.csv")
 GEI$GEI = 1 - GEI$`Exclusion by Gender`
 GEI = GEI[,c("Year","GEI")]
 GEI
 ```
 
-## ACM
+## ACM (Mujeres en altos cargos)
 
 ```{r}
 library(tidyr)
-PrivateACM <- read_delim("data/PrivateACM.csv", 
+PrivateACM <- read_delim("../data/PrivateACM.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(...2 = col_skip(), 
         ...4 = col_skip(), ...6 = col_skip(), 
         ...8 = col_skip(), ...10 = col_skip(), 
@@ -73,7 +68,7 @@ PrivateACM <- read_delim("data/PrivateACM.csv",
         ...16 = col_skip(), ...17 = col_skip(), 
         ...1 = col_skip()), locale = locale(decimal_mark = ","), 
     trim_ws = TRUE, skip = 2)[1,] %>% gather(key="Year", value="ACM", 1:7)
-PublicACM <- read_delim("data/PublicACM.csv", 
+PublicACM <- read_delim("../data/PublicACM.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(...2 = col_skip(), 
         ...4 = col_skip(), ...6 = col_skip(), 
         ...8 = col_skip(), ...10 = col_skip(), 
@@ -84,54 +79,100 @@ PublicACM <- read_delim("data/PublicACM.csv",
 ACM <- rbind(PrivateACM,PublicACM) %>% group_by(Year) %>% summarise_all(.,mean)
 
 
-ACM$ACMD = dnorm(ACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09)
+ACM$ACMD = sapply(ACM$ACM/100,distribution)
 
 ACM$Year <- as.double(ACM$Year)
 
-#PrivateACM$ACMD = 1 - (dnorm(PrivateACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
-#PublicACM$ACMD = 1 - (dnorm(PublicACM$ACM/100,0.5,0.09) / dnorm(0.5,0.5,0.09))
-#PrivateACM
-#PublicACM
+ACM
 ```
 
-## PAR
+## PAR (Tasa de paro)
 
 ```{r}
-PAR <- read_delim("data/PAR.csv", 
+PAR <- read_delim("../data/PAR.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(Total = col_double()), locale = locale(decimal_mark = ","), 
     trim_ws = TRUE) %>% dplyr::filter(`Países` == "España")
 m = PAR %>% dplyr::filter(`Sexo/Brecha de género` == "Mujeres") %>% dplyr::select(c(Periodo,Total))%>% arrange(Periodo)
+h = PAR %>% dplyr::filter(`Sexo/Brecha de género` == "Hombres") %>% dplyr::select(c(Periodo,Total))%>% arrange(Periodo)
 tot = PAR %>% dplyr::filter(`Sexo/Brecha de género` != "Brecha de género (mujeres - hombres)")%>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
-tot$PAR = abs((m$Total - tot$Total)/tot$Total)
-tot$PARD = dnorm(tot$PAR,0.5,0.09) / dnorm(0.5,0.5,0.09)
+tot$PAR = m$Total / tot$Total
+tot$PARD = sapply(tot$PAR,distribution)
 tot$Year = tot$Periodo
 tot = tot[,c("Year","PARD")]
 PAR = tot
 PAR
 ```
 
-## SAL
+## SAL (Salario Medio por Género)
 
 ```{r}
-SAL <- read_delim("data/SAL.csv", delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Sexo/Brecha de genero` != "Cociente mujeres respecto a hombres")
+SAL <- read_delim("../data/SAL.csv", delim = ";", escape_double = FALSE, locale = locale(decimal_mark = ","), trim_ws = TRUE) %>% dplyr::filter(`Sexo/Brecha de genero` != "Cociente mujeres respecto a hombres")
 m = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Mujeres")
 #m 18635.06	
 h = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(`Sexo/Brecha de genero` == "Hombres")
 #h 22302.60	
 tot2 = SAL %>% group_by(Periodo,`Sexo/Brecha de genero`) %>% summarise(Total = mean(Total,na.rm = T)) %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
-tot2$TSAL = abs((m$Total - tot2$Total)/tot2$Total)
-tot2$SALD = dnorm(tot2$TSAL,0.5,0.09) / dnorm(0.5,0.5,0.09)
+tot2$TSAL = m$Total / tot2$Total
+tot2$SALD = sapply(tot2$TSAL,distribution)
 tot2$Year = tot2$Periodo
 tot2 = tot2[,c("Year","SALD")]
 SAL = tot2
 SAL
 ```
 
-
-## VVG
+## MI (Mujeres Investigadoras)
 
 ```{r}
-VVG <- read_delim("data/VVG.csv", 
+library(readr)
+MIraw <- read_delim("../data/MI.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols(`2016` = col_double(), 
+        `2017` = col_double(), `2018` = col_double(), 
+        `2019` = col_double(), `2020` = col_double(), 
+        ...2 = col_skip(), ...4 = col_skip(), 
+        ...6 = col_skip(), ...8 = col_skip(), 
+        ...10 = col_skip()), locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE, skip = 2)[11,]
+
+MI = data.frame(Year = c(2016,2017,2018,2019,2020),MI = c(39.1,38.8,38.8,39.9,39.9))
+
+
+MI$MIMD = sapply(MI$MI/100,distribution)
+
+MI$MI = NULL
+
+MI
+
+```
+
+## CM (Carencias materiales)
+
+```{r}
+CM <- read_delim("../data/CM.csv", 
+    delim = ";", escape_double = FALSE, col_types = cols( 
+        Total = col_double()), locale = locale(decimal_mark = ","), 
+    trim_ws = TRUE) %>% dplyr::filter(`España y UE-28` == "España" & `Grupos de edad` == "Total")
+
+CM$`España y UE-28` = NULL
+CM$`Grupos de edad` = NULL
+
+m = CM %>% group_by(Periodo,Sexo) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Mujeres")
+
+h = CM %>% group_by(Periodo,Sexo) %>% summarise(Total = mean(Total,na.rm = T)) %>% dplyr::filter(Sexo == "Hombres")
+
+tot3 = CM %>% group_by(Periodo,Sexo) %>% summarise(Total = mean(Total,na.rm = T)) %>% group_by(Periodo) %>% summarise(Total = sum(Total,na.rm=T))
+tot3$CM = m$Total / tot3$Total
+tot3$CMD = sapply(tot3$CM,distribution)
+tot3$Year = tot3$Periodo
+tot3 = tot3[,c("Year","CMD")]
+CM = tot3
+CM
+```
+
+
+## VVG (Víctimas de Violencia de Género)
+
+```{r}
+VVG <- read_delim("../data/VVG.csv", 
     delim = ";", escape_double = FALSE, col_types = cols(...1 = col_double(),...2 = col_skip(), 
         ...4 = col_skip(), ...5 = col_skip()), 
     trim_ws = TRUE, skip = 2)
@@ -147,100 +188,127 @@ VVG
 
 ```{r}
 library(tidyr)
-df <- full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG)) %>% drop_na()
+df <- full_join(full_join(full_join(full_join(full_join(E2E,ACM), full_join(PAR,GEI)), full_join(SAL, VVG)),MI),CM) %>% drop_na()
 GGI <- function(df, year){
   df = df[df$Year==year,]
   
-  ECO <- mean(c(df$SALD,df$PARD,df$ACMD))
-  SOC <- mean(c(df$RVVG,df$GEI))
-  CUL <- df$DE2ED
+  ECO <- mean(c(df$SALD,df$PARD,df$ACMD),na.rm = T)
+  SOC <- mean(c(df$RVVG,df$GEI,df$CMD),na.rm = T)
+  CUL <- mean(c(df$DE2ED,df$MIMD),na.rm = T)
   
   return(c(ECO,SOC,CUL,mean(c(ECO,SOC,CUL))))
 }
 areas = c("ECONOMIC","SOCIAL","CULTURAL")
 ggi = GGI(df,2020)
-ggi1 = GGI(df,2015)
+ggi1 = GGI(df,2016)
 df_plot = data.frame(Economico = c(ggi[1],ggi1[1]), Social = c(ggi[2],ggi1[2]), Cultural = c(ggi[3],ggi1[3]))
 ```
 
-```{r}
-library(fmsb)
-create_beautiful_radarchart <- function(data, color = "#00AFBB", 
-                                        vlabels = colnames(data), vlcex = 0.7,
-                                        caxislabels = NULL,plty = 1,pty = 32, title = NULL, ...){
-  radarchart(
-    data, axistype = 1,
-    # Customize the polygon 
-    pcol = color, plwd = 2, plty = plty,pty = pty, pfcol = scales::alpha("#00AFBB", 0.3),
-    # Customize the grid
-    cglcol = "grey", cglty = 1, cglwd = 0.8,
-    # Customize the axis
-    axislabcol = "grey", 
-    # Variable labels
-    vlcex = vlcex, vlabels = vlabels,
-    caxislabels = caxislabels, title = title, ...
-  )
-}
-#create_beautiful_radarchart(df_plot, caxislabels = c("", "", "", "", ""),title = "Gender Gap Index")
-create_beautiful_radarchart(
-  data = df_plot, caxislabels = c("", "", "", "", ""),
-  color = c("#00AFBB", "#E7B800"),title = "Indicador de Brecha de Género Generalizado",plty = c("solid", "dotted"),
-  pty = c(16,32)
-)
-legend(
-  x = "bottom", legend = c("2020","2015"), horiz = TRUE,
-  bty = "n", pch = 20 , col = c("#00AFBB", "#E7B800"),
-  text.col = "black", cex = 1, pt.cex = 1.5
-  )
-```
 
 ```{r}
 library(ggradar)
 library(dplyr)
-df_plot$Grupo = c(2020,2015)
+df_plot$Grupo = c(2020,2016)
 df_plot = df_plot %>% dplyr::select(c(Grupo,Economico,Social,Cultural))
- 
+library(ggplot2)
 lcols = c("#57ebc8","#79918d")
 grap = ggradar(df_plot,background.circle.colour = "white",fill = TRUE,fill.alpha = 0.2,group.colours = lcols
         ,plot.legend = FALSE,
         gridline.min.colour = "gray60",
         gridline.mid.colour = "gray60",
         gridline.max.colour = "gray60",
+        grid.line.width = 1.5,
         values.radar = c("", "", ""),
-        group.point.size = 0
+        group.point.size = 0,
+        #font.radar = "Corbel"
+        #linetype =  c("solid","dashed")
         )+           # Make background transparent
-  theme(rect = element_rect(fill = "transparent"))
+  theme(rect = element_rect(fill = "transparent"))#,text=element_text(size=160,family="Corbel")) 
 grap
 #Fonts
-ggsave(grap,            # Save transparent png file
-       filename = "ggp_transparent1.png",
-       bg = "transparent")
-#,font.radar = "") 
+#ggsave(grap,            # Save transparent png file
+#       filename = "grafico-def.png",
+#       bg = "transparent",dpi = 800)
 ```
 
 
 ```{r}
 library(ggplot2)
-años = c(2015,2016,2017,2018,2019,2020)
-GGI = c(0.6925274,0.7182317,0.7177220,0.7245621,0.7161718,0.7437936)
+años = c(2016,2017,2018,2019,2020)
+GGI = c(0.7882738,0.7916819,0.8045406,0.8050382,0.8220306)
 data = data.frame(Años = años,`Indice Brecha Genero` = GGI)
-ggplot(data,aes(x = años, y = GGI)) + geom_line(color = "#79918d",size = 1.25) + geom_point(color = "#79918d",shape = 4,size = 4) + ylim(c(0.6,0.9))
-#grosor lineas
-#fondo blando
-#sin fondo si se puede
-# color 
-#tipos punto
+plt = ggplot(data,aes(x = años, y = GGI)) + geom_line(color = "#79918d",size = 1.5) + geom_point(color = "#79918d",shape = 4,size = 6) + ylim(c(0.6,0.9)) + xlab("") + ylab("")
+plt
+#ggsave(plt + theme(text=element_text(size=25,family="Corbel"),panel.background = element_blank()),            # Save transparent png file
+#       filename = "grafico2.png",
+#       bg = "transparent",dpi = 800)
+
 ```
 
 ```{r}
 #SALARIO 
 22302.60 - 18635.06
-ggplot() + geom_line(aes(x = c(18635.06,22302.60),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(18635.06,22302.60),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,80000)) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+a = ggplot() + geom_line(aes(x = c(0,80000),y = c(1,1)),color = "black")+ geom_line(aes(x = c(18635.06,22302.60),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(18635.06,22302.60),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,80000)) + theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+a
+#ggsave(a,            # Save transparent png file
+#       filename = "salario_22302'60_18635'06_3667'54_.png",
+#       bg = "transparent",dpi = 800)
 ```
 
 ```{r}
 100 - 35.60	
 #Altos cargos Mujeres
 35.60 - 64.4
-ggplot() + geom_line(aes(x = c(35.60,64.4),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(35.60,64.4),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,100)) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+b = ggplot() + geom_line(aes(x = c(0,100),y = c(1,1)),color = "black")+ geom_line(aes(x = c(35.60,64.4),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(35.60,64.4),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,100))+ theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+b
+#ggsave(b, 
+#       filename = "altoscargos_64'4_35'60_-28'8_.png",
+#       bg = "transparent",dpi = 800)
+```
+
+
+```{r}
+
+#Paro
+17.4 - 13.9
+c = ggplot() + geom_line(aes(x = c(0,100),y = c(1,1)),color = "black")+ geom_line(aes(x = c(13.9,17.4),y = c(0,0)),color = "darkolivegreen1",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(13.9,17.4),y = c(0,0)),shape=18,size = 3,color = c("magenta4","olivedrab")) + xlim(c(0,100))+ theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+c
+#ggsave(c, 
+#       filename = "paro_13'9_17'4_3'5.png",
+#       bg = "transparent",dpi = 800)
+```
+
+
+```{r}
+
+#Educacion
+81.9 - 70.2
+e = ggplot() + geom_line(aes(x = c(0,100),y = c(0.25,0.25)),color = "black")+ geom_line(aes(x = c(70.2,81.9),y = c(0,0)),color = "darkolivegreen1",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(70.2,81.9),y = c(0,0)),shape=18,size = 3,color = c("magenta4","olivedrab")) + xlim(c(0,100))+ theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+e
+#ggsave(e, 
+#       filename = "educacion.png",
+#       bg = "transparent",dpi = 800)
+```
+
+```{r}
+
+#Carencias materiales
+7 - 6.9
+f = ggplot() + geom_line(aes(x = c(0,100),y = c(0.25,0.25)),color = "black")+ geom_line(aes(x = c(6.9,7),y = c(0,0)),color = "darkolivegreen1",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(6.9,7),y = c(0,0)),shape=18,size = 3,color = c("magenta4","olivedrab")) + xlim(c(0,100))+ theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+f
+#ggsave(f, 
+#       filename = "carencias_materiales.png",
+#       bg = "transparent",dpi = 800)
+```
+
+```{r}
+#Mujeres en Investigación
+100 - 39.9
+
+60.1 - 39.9
+f = ggplot() + geom_line(aes(x = c(0,100),y = c(0.25,0.25)),color = "black")+ geom_line(aes(x = c(39.9,60.1),y = c(0,0)),color = "plum3",alpha = 0.4,size = 3.5) + geom_point(aes(x = c(39.9,60.1),y = c(0,0)),shape=18,size = 3,color = c("olivedrab","magenta4")) + xlim(c(0,100))+ theme(panel.background = element_blank()) #+ geom_text(aes(x = c(15500,26000),y = c(0,0)),label = c("18'6k","22'3k"))
+f
+#ggsave(f, 
+#       filename = "mujeres_investigacion.png",
+#       bg = "transparent",dpi = 800)
 ```
