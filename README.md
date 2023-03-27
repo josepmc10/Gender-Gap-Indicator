@@ -75,38 +75,15 @@ https://www.juntadeandalucia.es/institutodelamujer/ugen/modulos/Indicadores/bgen
 
 ## Annex
 
-
+![](/figures/figure1.png)
+![](/figures/figure2.png)
+![](/figures/figure3.png)
+![](/figures/figure4.png)
+![](/figures/figure5.png)
+![](/figures/figure6.png)
+![](/figures/figure7.png)
 
 
 ![Gender Gap Index](/figures/radar_plot.png)
 
 ![Temporal Serie](/figures/temporal_plot.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
