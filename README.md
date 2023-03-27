@@ -22,12 +22,12 @@ We find ourselves in the framework defined by Bourdieu, where he defines social 
 ### Aplication 
 
 Once the three dimensions on which we are going to work have been defined, the application of our study will be carried out at the national level. The initial objective was to be able to carry out these analyses also at the European level in order to compare the values obtained, but the difficulty of acquiring the same variables in the other countries has led us to focus on the national level.
-\n
+
 
 By carrying out the calculations at the national level, it allows us to see a temporal evolution in the indicator constructed with the objective of serving as a support for decision-making in public policies that favour citizens with non-discriminatory conditions. Moreover, it is not only a composite indicator to help in decision-making, but also serves as a tool for analysis and comparison year by year of the magnitude of inequality in each period.
-\n
+
 The way in which the indicator is established leads us to obtain an aggregate value from the values of the three pillars defined at the beginning (Cultural, Social and Economic). Since the construction of the indicator is a composite value from the results obtained in each pillar, each branch can also be studied individually. In the same way, the value obtained for each pillar can serve as a support for the decisions to be made.
-\n
+
 ### Data adquisition
 
 The data we needed and acquired were acquired through the official INE website, which provides a large set of gender-segregated data that allows us to explore the best ways to express the three pillar-defined blocks that we focus on with this indicator.
@@ -45,7 +45,7 @@ As the last indicator chosen for the creation of the general indicator, the perc
 ### Social
 
 The most worrying and most direct case of social discrimination is the Victims of Gender Violence. The series obtained goes from 1999 to 2022 and the formula can be found in Figure 4 of the Annex.
-\n
+
 	Continuing with the disaggregated social indicators, it has been decided to include the Gender Exclusion Index indicator as it is a reliable international indicator that brings inter-state rigorousness to the global indicator. It also includes certain aspects of society that could not be collected through the data provided by the INE. The value is between 0 and 1, with 1 being the ideal situation where there is no gender exclusion, so no extra calculations are needed. The series runs from 1900 to 2020.
 	Finally in the social block it is about Material Deprivation with a time series from 2016 to 2020 which offers another blind view that the study could have. The calculations are expressed in the Annex, Figure 5.
   
