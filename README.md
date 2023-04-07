@@ -4,7 +4,16 @@ This repository is the result of a final proyect in University of Valencia and p
 
 The result of this work is the implementation of a Gender Gap Index that provides which provides a global view of the gender gap and also a disaggregated view by economic, social and cultural dimensions.
 
+### Table of Contents
+- [Introduction](#intro) 
+- [Related work](#rel) 
+- [Problem Statement](#prob) 
+- [Gender Gap Indicator](#over) 
+- [Bibliography](#bib) 
+- [Annex](#ann) 
 
+
+<a name="intro"></a>
 ## Introduction
 
 Gender equality is a critical issue in the 21st century and a key goal in the United Nations 2030 Agenda for Sustainable Development. Specifically, Sustainable Development Goal (SDG) 5 seeks to achieve gender equality and empower all women and girls. This study contributes to this goal by analysing gender inequality in Spain through a composite indicator that addresses three key dimensions: cultural, social and economic. The indicator developed provides valuable information to identify areas for improvement and measure progress towards gender equality in the country.
@@ -12,11 +21,12 @@ Although the initial objective was to make comparisons at the European level, th
 This Spain-focused approach allows for a detailed and contextualised assessment of the gender equality situation in the country, which facilitates the identification of specific areas where further intervention and the implementation of effective public policies are required. Furthermore, by analysing gender inequality in economic, social and cultural dimensions, this study provides a comprehensive and holistic perspective of the issue, allowing for a better understanding of the multiple facets of inequality and how they interact with each other.
 Ultimately, this study aims to contribute to the achievement of SDG 5 by providing a rigorous and accessible analytical tool to enable policymakers, researchers and other stakeholders to monitor progress towards gender equality in Spain and develop effective interventions to address the inequalities identified.
 
-
+<a name="rel"></a>
 ## Related work
 
 There are extensive studies related to the construction of gender indicators. Already in 2006 UNICEF in its annual reports developed a series of indicators that make visible the condition of society and the importance of taking measures in order to achieve real gender equality [2]. Numerous studies also took place in Spain, with the Guide to Gender Indicators of the Junta de Andalucía [3] where, in addition to an extensive definition and framing of these indicators with examples, the importance that these indicators should have both quantitative and qualitative components was stressed. Not only disaggregated indicators have been used in gender studies, undoubtedly the most famous in the field developed by the WEF based on 4 pillars, Economic, Education, Health and Politics, which although being a composite indicator made up of more than 14 variables, does not contain any qualitative component[4]. The latter, in addition to providing an aggregate global vision, also allows us to obtain a disaggregated study and pursues the philosophy of our study, to provide a global and generalised view that at the same time allows us to observe the casuistry of the different areas in order to find points of revision.
 
+<a name="prob"></a>
 ## Problem statement
 
 We find ourselves in the framework defined by Bourdieu, where he defines social capital, economic capital and cultural capital as the axes that position each individual in society (and even a fourth one, symbolic capital, but which we will not use in this case). As a result of this sociological analysis, we consider these 3 areas as the spaces where discrimination is generated and therefore fields of observation for the phenomenon of the gender gap.
@@ -34,6 +44,7 @@ The way in which the indicator is established leads us to obtain an aggregate va
 
 The data we needed and acquired were acquired through the official INE website, which provides a large set of gender-segregated data that allows us to explore the best ways to express the three pillar-defined blocks that we focus on with this indicator.
 
+<a name="over"></a>
 ## GENDER GAP INDICATOR OVERALL
 
 Due to the difficulty of obtaining a large number of different variables, it was decided to choose those that provided a richer time series and could be more representative of the blocks to be staged. Three variables/indicators have been chosen for each of the blocks presented below.
@@ -56,11 +67,12 @@ Continuing with the disaggregated social indicators, it has been decided to incl
   For the last block, which refers to the cultural environment of Spanish society, the first group studied for the generation of indicators is the percentage of people aged 20-24 who have passed Secondary Education, with data for both men and women separately. These education data have been considered because of their influence on the fundamental development of people's lives and finding a gap in this dimension would be worrying. The data provided in the INE ranges from 2014 to 2021 and the formulas developed can be found in Figure 6 in the Annex.
 The last indicator used for the global indicator is the percentage of female researchers as a fundamental source to ensure that scientific progress is not biased by gender, thus producing feedback discrimination in society. The time series for which we have the data starts in 2016 and ends in 2020 and the formulas can be found in Figure 7 of the Annex.
 
-
+<a name="con"></a>
 ## Conclusions
 
 The indicator developed in this study serves as a tool for analysis and comparison of gender inequality in Spain in the economic, social and cultural dimensions. This indicator facilitates decision-making in public policies and highlights the areas where greater intervention is required to achieve non-discriminatory conditions and promote a more egalitarian society.
 
+<a name="bib"></a>
 ## Bibliography
 
 [1] Unidad de Igualdad de Género, Junta de Andalucía.
@@ -76,7 +88,7 @@ https://www.juntadeandalucia.es/institutodelamujer/ugen/modulos/Indicadores/bgen
 
 [6] Serrano Argüeso, M., & Aboitiz Cazalis, M. (2018). ¿Es necesaria en España una ley para combatir la brecha salarial por causa de sexo y de género?. Revista De Trabajo Y Seguridad Social. CEF, (427), 115–149. https://doi.org/10.51302/rtss.2018.1516
 
-
+<a name="ann"></a>
 ## Annex
 
 ![](/figures/figure1.png)
