@@ -10,9 +10,10 @@ The result of this work is the implementation of a Gender Gap Index that provide
 
 ## Introduction
 
-The gender gap, defined as the analytical and empirical construct that arises from the difference between categories of a variable in relation to male and female rates[1] remains a serious problem to this day because of these differences.
-
-...
+Gender equality is a critical issue in the 21st century and a key goal in the United Nations 2030 Agenda for Sustainable Development. Specifically, Sustainable Development Goal (SDG) 5 seeks to achieve gender equality and empower all women and girls. This study contributes to this goal by analysing gender inequality in Spain through a composite indicator that addresses three key dimensions: cultural, social and economic. The indicator developed provides valuable information to identify areas for improvement and measure progress towards gender equality in the country.
+Although the initial objective was to make comparisons at the European level, the difficulty in obtaining comparable variables in other countries led to focus only on the national level. However, this limitation does not diminish the importance and relevance of the study, as gender equality is a global challenge that affects all societies, and this specific indicator for Spain can serve as a basis for future research and international comparisons.
+This Spain-focused approach allows for a detailed and contextualised assessment of the gender equality situation in the country, which facilitates the identification of specific areas where further intervention and the implementation of effective public policies are required. Furthermore, by analysing gender inequality in economic, social and cultural dimensions, this study provides a comprehensive and holistic perspective of the issue, allowing for a better understanding of the multiple facets of inequality and how they interact with each other.
+Ultimately, this study aims to contribute to the achievement of SDG 5 by providing a rigorous and accessible analytical tool to enable policymakers, researchers and other stakeholders to monitor progress towards gender equality in Spain and develop effective interventions to address the inequalities identified.
 
 
 ## Related work
