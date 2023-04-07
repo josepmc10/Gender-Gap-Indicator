@@ -48,7 +48,7 @@ As the last indicator chosen for the creation of the general indicator, the perc
 
 The most worrying and most direct case of social discrimination is the Victims of Gender Violence. The series obtained goes from 1999 to 2022 and the formula can be found in Figure 4 of the Annex.
 
-	Continuing with the disaggregated social indicators, it has been decided to include the Gender Exclusion Index indicator as it is a reliable international indicator that brings inter-state rigorousness to the global indicator. It also includes certain aspects of society that could not be collected through the data provided by the INE. The value is between 0 and 1, with 1 being the ideal situation where there is no gender exclusion, so no extra calculations are needed. The series runs from 1900 to 2020.
+Continuing with the disaggregated social indicators, it has been decided to include the Gender Exclusion Index indicator as it is a reliable international indicator that brings inter-state rigorousness to the global indicator. It also includes certain aspects of society that could not be collected through the data provided by the INE. The value is between 0 and 1, with 1 being the ideal situation where there is no gender exclusion, so no extra calculations are needed. The series runs from 1900 to 2020.
 	Finally in the social block it is about Material Deprivation with a time series from 2016 to 2020 which offers another blind view that the study could have. The calculations are expressed in the Annex, Figure 5.
   
   ### Cultural
@@ -58,6 +58,8 @@ The last indicator used for the global indicator is the percentage of female res
 
 
 ## Conclusions
+
+The indicator developed in this study serves as a tool for analysis and comparison of gender inequality in Spain in the economic, social and cultural dimensions. This indicator facilitates decision-making in public policies and highlights the areas where greater intervention is required to achieve non-discriminatory conditions and promote a more egalitarian society.
 
 ## Bibliography
 
